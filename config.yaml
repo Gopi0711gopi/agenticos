@@ -1,0 +1,140 @@
+# Peripheral Agentic OS — Configuration
+# v2.0.0
+
+system:
+  name: "Peripheral Agentic OS"
+  version: "2.0.0"
+  mode: "power"  # companion | power
+  data_dir: "./data"
+  log_level: "info"  # debug | info | warn | error
+
+# Model providers
+providers:
+  openai:
+    enabled: true
+    api_key_env: "OPENAI_API_KEY"
+    base_url: "https://api.openai.com/v1"
+  anthropic:
+    enabled: true
+    api_key_env: "ANTHROPIC_API_KEY"
+    base_url: "https://api.anthropic.com/v1"
+  google:
+    enabled: true
+    api_key_env: "GOOGLE_API_KEY"
+    base_url: "https://generativelanguage.googleapis.com/v1beta"
+  azure:
+    enabled: false
+    api_key_env: "AZURE_API_KEY"
+    endpoint: ""
+  ollama:
+    enabled: true
+    base_url: "http://localhost:11434"
+  lmstudio:
+    enabled: false
+    base_url: "http://localhost:1234"
+  llamacpp:
+    enabled: false
+    base_url: "http://localhost:8080"
+  vllm:
+    enabled: false
+    base_url: "http://localhost:8000"
+  bedrock:
+    enabled: false
+    region: "us-east-1"
+  huggingface:
+    enabled: false
+    api_key_env: "HF_API_KEY"
+    base_url: "https://api-inference.huggingface.co"
+
+# Routing configuration
+routing:
+  default_strategy: "balanced"  # quality | balanced | cost | cascade | pomdp
+  cache_ttl: 3600  # Model discovery cache TTL in seconds
+  q_learning:
+    epsilon: 0.1
+    gamma: 0.0  # Contextual bandit (no discount)
+    persist_interval: 10  # Persist Q-table every N episodes
+  pomdp:
+    belief_floor: 0.01
+    belief_ceiling: 0.99
+    cost_weight: 0.3
+
+# Budget defaults
+budget:
+  default_task_budget: 1.0  # USD
+  max_budget_multiplier: 3  # Max redesign budget = 3x original
+  warn_threshold: 0.8  # Warn at 80% budget
+
+# Forge settings
+forge:
+  max_redesigns: 5
+  design_quality_threshold: 0.7
+  default_topology: "sequential"
+
+# Judge settings
+judge:
+  default_profile: "default"
+  min_judges: 1
+  max_judges: 5
+  quality_threshold: 0.6
+  consensus_algorithm: "weighted_majority"  # weighted_majority | bft | raft
+
+# Quality guards
+quality:
+  goodhart:
+    entropy_threshold: 0.3
+    calibration_delta: 0.15
+    inflation_multiplier: 1.5
+    window_size: 50
+  drift:
+    jsd_threshold: 0.877
+    recalibration_trigger: 0.5  # 50% of judges drifting
+  trilemma:
+    max_q_delta: 0.15
+    max_iterations: 5
+  contracts:
+    enabled: true
+    fail_fast: true
+
+# Memory (SLM-Lite)
+memory:
+  working:
+    max_entries: 100
+  episodic:
+    promotion_threshold: 3  # accesses before promotion
+  semantic:
+    trust_threshold: 0.6
+    max_entries: 10000
+  procedural:
+    decay_rate: 0.95
+
+# Transport
+transport:
+  http:
+    port: 3700
+    host: "0.0.0.0"
+    cors_origins: ["http://localhost:5173"]
+  websocket:
+    port: 3701
+    fast_poll_ms: 3000
+    slow_poll_ms: 10000
+  cli:
+    history_file: ".paos_history"
+
+# Dashboard
+dashboard:
+  enabled: true
+  port: 5173
+  lazy_load_threshold: 10  # Lazy-load tabs after this index
+
+# Marketplace
+marketplace:
+  registry_url: "https://github.com/qualixar/qos-registry"
+  plugin_dir: "./plugins"
+  sandbox_default: "community"  # verified | community | restricted
+
+# Enterprise
+enterprise:
+  rbac_enabled: false
+  audit_enabled: true
+  encryption_algorithm: "aes-256-gcm"
